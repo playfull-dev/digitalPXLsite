@@ -78,8 +78,12 @@ nav {
   color: var(--white);
   text-decoration: none;
   letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 .nav-logo span { color: var(--grey2); }
+.nav-logo canvas { image-rendering: pixelated; }
 
 .nav-links { display: flex; gap: 32px; list-style: none; }
 .nav-links a {
@@ -493,7 +497,7 @@ footer {
 
 <!-- NAV -->
 <nav>
-  <a href="#home" class="nav-logo">DIGITAL <span>PXL</span></a>
+  <a href="#home" class="nav-logo"><canvas id="navLogo" width="33" height="33"></canvas>DIGITAL <span>PXL</span></a>
   <ul class="nav-links">
     <li><a href="#games">GAMES</a></li>
     <li><a href="#about">ABOUT</a></li>
@@ -576,14 +580,14 @@ footer {
       <p>Got a collab idea? Press opportunity? Or just want to talk games?</p>
       <p style="margin-top:16px;">Drop us a message and we'll get back to you.</p>
       <div class="socials">
-        <a href="#" class="social-link">TWITTER / X</a>
-        <a href="#" class="social-link">INSTAGRAM</a>
-        <a href="#" class="social-link">TIKTOK</a>
-        <a href="#" class="social-link">DISCORD</a>
-        <a href="#" class="social-link">YOUTUBE</a>
+        <a href="https://x.com/_DigitalPXL" class="social-link">TWITTER / X</a>
+        <a href="https://www.instagram.com/digital.pxl/" class="social-link">INSTAGRAM</a>
+        <a href="https://www.tiktok.com/@digital.pxl" class="social-link">TIKTOK</a>
+        <a href="https://discord.gg/RzZQqpJEzV" class="social-link">DISCORD</a>
+        <a href="https://www.youtube.com/@digitalpxl" class="social-link">YOUTUBE</a>
       </div>
     </div>
-    <form class="contact-form" onsubmit="handleSubmit(event)">
+    <form class="contact-form" id="contactForm">
       <div class="form-field">
         <label>YOUR NAME</label>
         <input type="text" placeholder="Player One" required>
@@ -616,7 +620,39 @@ document.addEventListener('mousemove', e => {
   cursor.style.top = e.clientY + 'px';
 });
 
-// Hero pixel icon
+// Pixel logo grid
+const logoGrid = [
+  [0,1,1,1,1,1,1,1,0,0,0],
+  [1,1,2,2,2,2,2,1,1,0,0],
+  [1,2,0,0,0,0,0,2,1,1,0],
+  [1,2,0,1,1,1,0,0,2,1,1],
+  [1,2,0,1,0,1,0,0,2,1,1],
+  [1,2,0,1,1,1,0,0,2,1,1],
+  [1,2,0,0,0,0,0,0,2,1,1],
+  [1,2,0,0,0,0,0,2,1,1,0],
+  [1,1,2,2,2,2,2,1,1,0,0],
+  [0,1,1,1,1,1,1,1,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0],
+];
+
+function drawLogoOnCanvas(canvasEl, pxSize) {
+  const ctx = canvasEl.getContext('2d');
+  const gap = 1;
+  canvasEl.width = 11 * (pxSize + gap);
+  canvasEl.height = 11 * (pxSize + gap);
+  logoGrid.forEach((row, ri) => {
+    row.forEach((val, ci) => {
+      if (val === 0) return;
+      ctx.fillStyle = val === 1 ? '#ffffff' : '#444444';
+      ctx.fillRect(ci*(pxSize+gap), ri*(pxSize+gap), pxSize, pxSize);
+    });
+  });
+}
+
+// Nav logo (small)
+drawLogoOnCanvas(document.getElementById('navLogo'), 2);
+
+// Hero icon
 const heroGrid = [
   [0,1,1,1,1,1,1,1,0,0,0],
   [1,1,2,2,2,2,2,1,1,0,0],
@@ -660,14 +696,38 @@ makeThumb('thumb2', (r,c,R,C) => {
   return (r+c)%3===0 || r===Math.floor(R/2);
 }, '#444');
 
-// Form submit
-function handleSubmit(e) {
+// Form submit via Formspree
+document.getElementById('contactForm').addEventListener('submit', async function(e) {
   e.preventDefault();
+  const btn = this.querySelector('.form-submit');
   const msg = document.getElementById('formMsg');
-  msg.style.display = 'block';
-  e.target.reset();
+  btn.textContent = 'SENDING...';
+  btn.disabled = true;
+  try {
+    const res = await fetch('https://formspree.io/f/xpwzgnjq', {
+      method: 'POST',
+      headers: { 'Accept': 'application/json' },
+      body: new FormData(this)
+    });
+    if (res.ok) {
+      msg.textContent = '✓ MESSAGE SENT. WE\'LL BE IN TOUCH.';
+      msg.style.color = 'var(--grey2)';
+      msg.style.display = 'block';
+      this.reset();
+    } else {
+      msg.textContent = '✗ SOMETHING WENT WRONG. TRY AGAIN.';
+      msg.style.color = '#ff4444';
+      msg.style.display = 'block';
+    }
+  } catch {
+    msg.textContent = '✗ NETWORK ERROR. TRY AGAIN.';
+    msg.style.color = '#ff4444';
+    msg.style.display = 'block';
+  }
+  btn.textContent = 'SEND MESSAGE ▶';
+  btn.disabled = false;
   setTimeout(() => msg.style.display = 'none', 5000);
-}
+});
 
 // Scroll reveal
 const observer = new IntersectionObserver(entries => {
@@ -686,4 +746,3 @@ document.querySelectorAll('.game-card, .stat-box, .about-text, .contact-info, .c
 </script>
 </body>
 </html>
-
