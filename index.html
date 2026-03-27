@@ -587,21 +587,20 @@ footer {
         <a href="https://www.youtube.com/@digitalpxl" class="social-link">YOUTUBE</a>
       </div>
     </div>
-    <form class="contact-form" id="contactForm">
+    <form class="contact-form" action="https://formspree.io/f/maqppppl" method="POST">
       <div class="form-field">
         <label>YOUR NAME</label>
-        <input type="text" placeholder="Player One" required>
+        <input type="text" name="name" placeholder="Player One" required>
       </div>
       <div class="form-field">
         <label>EMAIL</label>
-        <input type="email" placeholder="you@example.com" required>
+        <input type="email" name="email" placeholder="you@example.com" required>
       </div>
       <div class="form-field">
         <label>MESSAGE</label>
-        <textarea placeholder="Type your message here..." required></textarea>
+        <textarea name="message" placeholder="Type your message here..." required></textarea>
       </div>
       <button type="submit" class="form-submit">SEND MESSAGE ▶</button>
-      <div class="form-msg" id="formMsg">✓ MESSAGE SENT. WE'LL BE IN TOUCH.</div>
     </form>
   </div>
 </section>
